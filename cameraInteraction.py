@@ -4,6 +4,7 @@ import os;
 import numpy
 
 changeCameraModeRequest = False;
+setExit = False;
 drawRectangle = False;
 modesOfCamera = numpy.array([cv2.COLOR_BGR2GRAY, cv2.COLOR_BGR2RGB, cv2.IMREAD_COLOR, cv2.COLOR_RGB2YUV, cv2.COLOR_RGB2HLS])
 pointsOfRecatangle = [];

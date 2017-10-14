@@ -32,11 +32,10 @@ def drawRectangles(image):
     """This function is called when there are rectangle points present, it takes the image and drawn rectangle points as per the points that were taken"""
     global drawRectangle, pointsOfRecatangle;
     print pointsOfRecatangle;
-    if drawRectangle:
-        if len(pointsOfRecatangle)%2 == 0:
-            return internalDrawRectangle(image, 0, len(pointsOfRecatangle));
-        else:
-            return internalDrawRectangle(image, 0, len(pointsOfRecatangle) - 1);
+    if len(pointsOfRecatangle)%2 == 0:
+        return internalDrawRectangle(image, 0, len(pointsOfRecatangle));
+    else:
+        return internalDrawRectangle(image, 0, len(pointsOfRecatangle) - 1);
 
 def resetRectPoint():
     """This function helps in removing all the rectangles drawn from the image"""
@@ -106,6 +105,7 @@ def cameraInteraction(cameraName, cameraIndex):
 
 
 def call_camera(cameraIndex):
+    """This function is called every time there is change in camera request or for the first time to display the image"""
     cameraInteraction('Capture Image', cameraIndex)
 
 index = 0;

@@ -3,53 +3,64 @@ import datetime;
 import os;
 import numpy
 
-changeCamera = False;
+changeCameraModeRequest = False;
 drawRectangle = False;
-setExit = False;
-typeOfCamera = numpy.array([cv2.COLOR_BGR2GRAY, cv2.COLOR_BGR2RGB, cv2.IMREAD_COLOR, cv2.COLOR_RGB2YUV, cv2.COLOR_RGB2HLS ])
-# cameraModes = numpy.array([i for i in dir(cv2) if i.startswith('COLOR')])
-rectPoints = [];
+modesOfCamera = numpy.array([cv2.COLOR_BGR2GRAY, cv2.COLOR_BGR2RGB, cv2.IMREAD_COLOR, cv2.COLOR_RGB2YUV, cv2.COLOR_RGB2HLS])
+pointsOfRecatangle = [];
 
 def clickAndSetRectPoints(event, x, y, flags, param):
+    """This fuction is called when a mouse click event is occured"""
     print "Click Event Occured"
-    global rectPoints, drawRectangle;
+    global pointsOfRecatangle, drawRectangle;
     if(event == cv2.EVENT_LBUTTONDOWN):
         # rectPoints = [(x,y)];
-        rectPoints.append((x,y))
+        pointsOfRecatangle.append((x, y))
     elif(event == cv2.EVENT_LBUTTONUP):
-        rectPoints.append((x,y));
+        pointsOfRecatangle.append((x, y));
         drawRectangle = True;
 
 
 def internalDrawRectangle(image, startIndex, endIndex):
-    global rectPoints;
+    """This function actually draws the rectangle on the image based on all the points"""
+    global pointsOfRecatangle;
     for i in range(startIndex, endIndex, 2):
-        cv2.rectangle(image, rectPoints[i], rectPoints[i + 1], (0, 255, 0), 2)
+        cv2.rectangle(image, pointsOfRecatangle[i], pointsOfRecatangle[i + 1], (0, 255, 0), 2)
     return image;
 
 def drawRectangles(image):
-    global drawRectangle, rectPoints;
-    print rectPoints;
+    """This function is called when there are rectangle points present, it takes the image and drawn rectangle points as per the points that were taken"""
+    global drawRectangle, pointsOfRecatangle;
+    print pointsOfRecatangle;
     if drawRectangle:
-        if len(rectPoints)%2 == 0:
-            return internalDrawRectangle(image, 0, len(rectPoints));
+        if len(pointsOfRecatangle)%2 == 0:
+            return internalDrawRectangle(image, 0, len(pointsOfRecatangle));
         else:
-            return internalDrawRectangle(image, 0, len(rectPoints)-1);
+            return internalDrawRectangle(image, 0, len(pointsOfRecatangle) - 1);
 
 def resetRectPoint():
-    global drawRectangle, rectPoints;
-    rectPoints = [];
+    """This function helps in removing all the rectangles drawn from the image"""
+    global drawRectangle, pointsOfRecatangle;
+    pointsOfRecatangle = [];
     drawRectangle = False;
 
-def cameraInteraction(cameraName, cameraIndex):
+def removeLastDrawnRectangle():
+    """This function helps in removing the last drawn rectangle from captured Image"""
+    global pointsOfRecatangle, drawRectangle;
+    if (len(pointsOfRecatangle) % 2 == 0):
+        pointsOfRecatangle.pop();
+        pointsOfRecatangle.pop();
+        if (len(pointsOfRecatangle) == 0):
+            drawRectangle = False;
 
-    global changeCamera, drawRectangle, setExit, typeOfCamera, cameraModes, rectPoints;
+def cameraInteraction(cameraName, cameraIndex):
+    """Camera Interaction is the main function which interacts with the camera and shows the captured frame along with the rectangles"""
+    global changeCameraModeRequest, drawRectangle, setExit, modesOfCamera, cameraModes, pointsOfRecatangle;
     cv2.namedWindow(cameraName)
     camera = cv2.VideoCapture(0)
     while True:
         return_value, image = camera.read()
         cv2.setMouseCallback(cameraName, clickAndSetRectPoints)
-        capturedFrame = cv2.cvtColor(image,typeOfCamera[cameraIndex])
+        capturedFrame = cv2.cvtColor(image, modesOfCamera[cameraIndex])
         # capturedFrame = cv2.cvtColor(image,int(cv2.col+cameraModes[index]))
 
         capturedFrame = cv2.flip(capturedFrame, 1)
@@ -57,7 +68,7 @@ def cameraInteraction(cameraName, cameraIndex):
         if drawRectangle:
             capturedFrame = drawRectangles(capturedFrame);
             print "Drawing Rectangles with points"
-            print rectPoints
+            print pointsOfRecatangle
 
         cv2.imshow(cameraName, capturedFrame)
         k = cv2.waitKey(15) & 0xFF
@@ -82,15 +93,11 @@ def cameraInteraction(cameraName, cameraIndex):
 
         elif k == ord('c') or k== ord('C'):
             #change of camera
-            changeCamera=True;
+            changeCameraModeRequest=True;
             break;
         elif k==ord('l') or k == ord('L'):
             #Remove last rectangle Drawn
-            if(len(rectPoints)%2==0):
-                rectPoints.pop();
-                rectPoints.pop();
-                if(len(rectPoints)==0):
-                    drawRectangle = False;
+            removeLastDrawnRectangle();
 
     camera.release()
     cv2.destroyAllWindows()
@@ -104,11 +111,11 @@ index = 0;
 while True:
     print "Current Camera Index :", index
     call_camera(index);
-    if changeCamera:
+    if changeCameraModeRequest:
         print "Request for change in Camera"
-        changeCamera = False;
+        changeCameraModeRequest = False;
         index+=1;
-    if(index==typeOfCamera.size):
+    if(index==modesOfCamera.size):
         index=0
     if(setExit):
         break

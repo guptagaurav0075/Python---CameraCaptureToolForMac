@@ -83,7 +83,7 @@ def cameraInteraction(cameraName, cameraIndex):
             # saves the captured frame, if rectangles were present they would be added as well
             print numpy.size(image)
             now = datetime.datetime.now()
-            filename = str(os.path.expanduser('~'))+"/Desktop/test_"+ str(now)+".png";
+            filename = str(os.path.expanduser('~'))+"/Desktop/CCT_"+ str(now)+".png";
             cv2.imwrite(filename, capturedFrame)
 
         elif k == ord('r') or k==ord('R'):
